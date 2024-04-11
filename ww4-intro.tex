@@ -1,0 +1,182 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{colortbl}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Warewulf\\
+making cluster\\
+installations fast and \\
+reliable}
+\date{April 25, Ostrava}
+\author{Christian Goll <\texttt{cgoll@suse.com}>}
+\usetheme{suse}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Introduction}
+\framesubtitle{Warewulf is tool for managing beowulf clusters}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{Beowulf}
+  \begin{itemize}
+    \item old british poem
+  \end{itemize}
+\end{block}
+\begin{block}{Beowulf cluster}
+  \begin{itemize}
+    \item became popular in the 90.
+    \item use of the shelf hardware
+    \begin{itemize}
+      \item 486 \& linux
+      \item \textbf{not} Cray \& unix
+    \end{itemize}
+    \item warewulf is a typo of werewolf
+  \end{itemize}
+\end{block}
+\column{0.5\textwidth}
+  \includegraphics[width=.6\linewidth]{Beowulf}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Introduction}
+\framesubtitle{HPC landscape}
+\begin{block}{Top five Supercomputers}
+\begin{table}
+\begin{tabular}{c|l|l|l|l}
+1 &	Frontier& EPYC 64C &AMD MI250X &Slingshot-11 \\
+2 &	Aurora  & Xeon 9470 & Intel GPU Max&Slingshot-11 \\
+3 &	Eagle & Xeon 8480 &  NVIDIA H100 & NVIDIA Infiniband \\
+\rowcolor{backcolour}
+4 &	Fugaku &  A64FX 48C 2.2GHz & - & Tofu interconnect D \\
+5 &	LUMI &  EPYC 64C 2GHz & AMD MI250X & Slingshot-11 
+\end{tabular}
+\end{table}
+\begin{itemize}
+  \item only Fugaku uses non standard CPU
+  \item others are beowulf clusters with GPUs attached
+\end{itemize}
+\end{block}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Introduction}
+\framesubtitle{Beowulf cluster}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{base components}
+\begin{itemize}
+  \item management node
+  \item compute nodes
+  \item management network
+\end{itemize}
+\end{block}
+\begin{block}{optional components}
+\begin{itemize}
+  \item more compute nodes
+  \item fast network interconnects 
+  \item central storage
+  \item bmc/ipmi
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+  \includegraphics[width=.6\linewidth]{Transtec-056}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Introduction}
+\framesubtitle{Beowulf Cluster}
+\begin{block}{differences to data centers}
+  \begin{itemize}
+    \item compute nodes are cattle
+    \item compute are not updated after boot process
+    \item application come from central storage
+    \item applications are self compiled
+    \item one application can run over several nodes
+  \end{itemize}
+\end{block}
+\end{frame}
+%
+%\frametitle{Presentation Title}
+%\framesubtitle{This is \textit{a subtitle}.}
+%
+%\begin{columns}
+%
+%\column{0.5\textwidth}
+%This is a text in first column.
+%\begin{itemize}
+%  \item First item
+%  \item Second item
+%  \item \texttt{mono spaced font example}
+%  \begin{itemize}
+%    \item First item
+%    \item Second item
+%  \end{itemize}
+%\end{itemize}
+%
+%\column{0.5\textwidth}
+%This text will be in the second column
+%and on a second thought this is a nice looking
+%layout in some cases.
+%
+%\begin{lstlisting}[language=C, caption=C example]
+%#include <stdio.h>
+%
+%/* some comment */
+%int main() {
+%  printf("Hello World");
+%}
+%\end{lstlisting}
+%
+%\end{columns}
+%
+%\end{frame}
+%
+%\begin{frame}
+%\frametitle{Another slide}
+%\framesubtitle{This is \textit{a subtitle}.}
+%
+%\begin{table}
+%  \begin{tabular}{c|c}
+%    table1 & trial \\
+%    \hline
+%    \hline
+%    1 & 2 \\
+%    3 & 4
+%  \end{tabular}
+%  \caption*{My table}
+%\end{table}
+%\end{frame}
+%
+\end{document}
+
