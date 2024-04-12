@@ -17,7 +17,7 @@
     stringstyle=\color{codepurple},
     basicstyle=\ttfamily\footnotesize,
     breakatwhitespace=false,
-    breaklines=true,
+    breaklines=false,
     captionpos=b,
     keepspaces=true,
     numbers=left,
@@ -27,6 +27,30 @@
     showtabs=false,
     tabsize=2
 }
+
+
+\lstdefinestyle{yaml}{
+    basicstyle=\color{blue}\footnotesize,
+    string=[s]{'}{'},
+    comment=[l]{:},
+    morecomment=[l]{-}
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=false,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+ }
 
 \lstset{style=mystyle}
 
@@ -116,6 +140,8 @@ reliable}
 \begin{frame}[fragile]
 \frametitle{Introduction}
 \framesubtitle{Beowulf Cluster}
+\begin{columns}
+\column{0.5\textwidth}
 \begin{block}{differences to data centers}
   \begin{itemize}
     \item compute nodes are cattle
@@ -126,8 +152,144 @@ reliable}
     \item one application can run over several nodes
   \end{itemize}
 \end{block}
+\column{0.5\textwidth}
+  \includegraphics[width=.6\linewidth]{networkplan}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf description}
+\framesubtitle{software stack}
+\begin{columns}
+\column{0.5\textwidth}
+  \begin{block}{warewulf components}
+  \hspace*{.1\linewidth}\begin{minipage}{.8\linewidth}
+  \begin{block}{warewulfd delivers}
+    \begin{itemize}
+      \item kernel \& modules
+      \item node image
+      \item node configurations
+    \end{itemize}
+  \end{block}
+  \begin{block}{\texttt{wwctl} cmd line tool}
+    \begin{itemize}
+      \item manages node database
+      \item manages node image
+    \end{itemize}
+  \end{block}
+  \vspace*{1cm}
+  \end{minipage}
+  \end{block}
+\column{0.5\textwidth}
+  \begin{block}{external components}
+  \hspace*{.1\linewidth}\begin{minipage}{.8\linewidth}
+    \begin{block}{dhcp server}
+      \begin{itemize}
+      \item ISC dhcpd server
+      \item dnsmasq
+    \end{itemize}
+    \end{block}
+    \begin{block}{tftp}
+      \begin{itemize}
+      \item kernel tftp
+      \item dnsmasq
+    \end{itemize}
+    \end{block}
+  \end{minipage} 
+  \end{block}
+  \begin{block}{optional}
+    \begin{itemize}
+      \item nfs
+      \item manage \texttt{/etc/hosts}
+    \end{itemize}
+  \end{block}
+\end{columns}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Warewulf description}
+\framesubtitle{database \texttt{/etc/warewulf/nodes.conf}}
+\begin{columns}
+%
+\column{0.5\textwidth}
+\begin{itemize}
+\item plain yaml file
+  \item easy backup
+  \item can be version controlled
+  \item external tools support
+  \begin{itemize}
+    \item vim, ansible
+  \end{itemize}
+\end{itemize}
+\begin{block}{profiles}
+\begin{itemize}
+  \item stores identical values for collection of nodes
+  \item values can be overiden on node basis
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\begin{lstlisting}[style=yaml]
+WW_INTERNAL: 45
+nodeprofiles:
+  default:
+    comment: This profile is automatically included for each node
+    container name: leap
+    network devices:
+      default:
+        device: eth0
+nodes:
+  n01:
+    profiles:
+    - default
+    network devices:
+      default:
+        hwaddr: 52:54:00:4e:cb:1d
+        ipaddr: 172.16.130.101
+  n02:
+\end{lstlisting}
+%
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf description}
+\framesubtitle{command line database manipulation}
+\begin{columns}
+\column{0.25\textwidth}
+\begin{block}{add node}
+\texttt{wwctl node add n01 -I 10.10.10.1}
+\end{block}
+\begin{block}{modify node}
+\texttt{wwctl node set n01 --comment "Have fun"}
+\end{block}
+\begin{block}{list node}
+\texttt{wwctl node list n01 -a"}
+\end{block}
+\vspace*{3cm}
+\column{0.75\textwidth}
+\begin{lstlisting}[style=mystyle]
+NODE FIELD                    PROFILE    VALUE
+n01  Id                       --         n01
+n01  Comment                  SUPERSEDED Have fun
+n01  ContainerName            default    leap
+n01  Ipxe                     --         (default)
+n01  RuntimeOverlay           --         (generic)
+n01  SystemOverlay            --         (wwinit)
+n01  Root                     --         (initramfs)
+n01  Discoverable             --         false
+n01  Init                     --         (/sbin/init)
+n01  Kernel.Args              --         (quiet crashkernel=no vga=791 net.naming-scheme=v238)
+n01  Profiles                 --         default
+n01  PrimaryNetDev            --         (default)
+n01  NetDevs[default].Type    --         (ethernet)
+n01  NetDevs[default].OnBoot  --         (true)
+n01  NetDevs[default].Device  default    eth0
+n01  NetDevs[default].Hwaddr  --         52:54:00:4e:cb:1d
+n01  NetDevs[default].Ipaddr  --         172.16.130.101
+n01  NetDevs[default].Netmask --         (255.255.255.0)
+n01  NetDevs[default].Primary --         (true)
+\end{lstlisting}
+\end{columns}
+\end{frame}
+%
 %
 %\frametitle{Presentation Title}
 %\framesubtitle{This is \textit{a subtitle}.}
