@@ -1,5 +1,5 @@
 # add to PROJECTS variable all the projects to compile, without the .tex suffix
-PROJECTS = example
+PROJECTS = ww4-intro
 
 BUILDDIR = build
 OUTPUT_IMAGESDIR = $(BUILDDIR)/images
