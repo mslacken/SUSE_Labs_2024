@@ -20,4 +20,10 @@ Short introduction on warewulf
 
 ![Screenshot](build/images/ww4-intro-9.png)
 
+![Screenshot](build/images/ww4-intro-10.png)
+
+![Screenshot](build/images/ww4-intro-11.png)
+
+![Screenshot](build/images/ww4-intro-12.png)
+
 ([PDF ww4-intro](build/ww4-intro.pdf))

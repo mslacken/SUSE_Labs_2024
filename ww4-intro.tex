@@ -33,7 +33,7 @@
     basicstyle=\color{blue}\footnotesize,
     string=[s]{'}{'},
     comment=[l]{:},
-    morecomment=[l]{-}
+    morecomment=[l]{\-},
     backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen},
     keywordstyle=\color{magenta},
@@ -232,7 +232,7 @@ reliable}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Warewulf description}
+\frametitle{Warewulf configuration}
 \framesubtitle{database \texttt{/etc/warewulf/nodes.conf}}
 \begin{columns}
 \column{0.5\textwidth}
@@ -275,7 +275,7 @@ nodes:
 \end{columns}
 \end{frame}
 \begin{frame}[fragile]
-\frametitle{Warewulf description}
+\frametitle{Warewulf configuration}
 \framesubtitle{command line database manipulation}
 \begin{columns}
 \column{0.25\textwidth}
@@ -315,8 +315,8 @@ n01  NetDevs[default].Primary --         (true)
 \end{columns}
 \end{frame}
 \begin{frame}[fragile]
-\frametitle{Warewulf description}
-\framesubtitle{node configuration}
+\frametitle{Warewulf configuration}
+\framesubtitle{templates\& overlays}
 \begin{columns}
 \column{0.5\textwidth}
 \begin{block}{Configuration templates}
@@ -328,7 +328,7 @@ n01  NetDevs[default].Primary --         (true)
     can be called
   \end{itemize}
 \end{block}
-\begin{block}{Configurationi overlays}
+\begin{block}{Configuration overlays}
 \begin{itemize}
   \item rendered templates packed\\
   into overlay
@@ -351,6 +351,105 @@ Network:
 {{if $netdev.Hwaddr }}    {{$devname}}: {{$netdev.Hwaddr}}{{ end -}}
 {{end}}
 \end{lstlisting}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf configuration}
+\framesubtitle{overlays}
+warewulf defines two types of overlays
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{system overlay}
+\begin{itemize}
+  \item available on boot
+  \item warewulf boot strap files
+  \item static network configurations:
+  \begin{itemize}
+    \item wicked
+    \item NetworkManager
+    \item EL scripts
+  \end{itemize}
+  \item nfs mounts
+  \item file system mounts
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\begin{block}{runtime overlay}
+\begin{itemize}
+  \item updated on regular base
+  \item can be secured
+\end{itemize}
+\end{block}
+\begin{block}{user defined overlays}
+\begin{itemize}
+  \item users are encouraged to create own configuration templates
+  \item can reside in system \& runtime overlays
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf configuration}
+\framesubtitle{security}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{assumptions}
+  \begin{itemize}
+    \item private/cluster network is secure
+    \item lateral movement isnt't accounted
+    \begin{itemize}
+      \item NFS mounts are common, when not \textbf{mandatory}
+    \end{itemize}
+  \end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\begin{block}{measurements}
+  \begin{itemize}
+    \item node image \& system overlay protected with BIOS UUID
+    \item system overlays \textbf{must} be downloaded from privileged port
+  \end{itemize}
+\end{block}
+\end{columns}
+\includegraphics[height=3.5cm]{beowulf_architecture}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf configuration}
+\framesubtitle{node images}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{definition}
+\begin{itemize}
+  \item complete OS images
+  \item called containers in warewulf
+  \item must be imported from:
+  \begin{itemize}
+    \item chroot directory
+    \item docker registry
+    \item local \texttt{dockerd}
+  \end{itemize}
+  \item several different node images can be imported
+  \item node images are vendor independent
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\begin{block}{\texttt{registry.suse.com}}
+  \begin{itemize}
+    \item SUSE SLE 15SP5
+  \end{itemize}
+\end{block}
+\begin{block}{\texttt{registry.opensuse.org}}
+  \begin{itemize}
+    \item openSUSE Tumleweed
+    \item openSUSE Leap 15SP[3-5]
+   \end{itemize}
+\end{block}
+\begin{block}{\texttt{ghcr.io}}
+  \begin{itemize}
+    \item openSUSE Leap
+    \item Rocky EL (8\&9)
+    \item Debian Bockworm
+  \end{itemize}
+\end{block}
 \end{columns}
 \end{frame}
 %
