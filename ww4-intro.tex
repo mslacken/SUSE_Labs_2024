@@ -51,6 +51,32 @@
     showtabs=false,
     tabsize=2
  }
+\lstdefinestyle{ww}{
+    basicstyle=\color{blue}\footnotesize,
+    morestring=[b]{"},
+    comment=[s]{.}{\ },
+    morecomment=[s]{.}{\}},
+    morecomment=[s]{\$}{\ },
+    morecomment=[s]{\$}{\}},
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=false,
+    captionpos=t,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    keywords={if,range,end},
+ }
+
 
 \lstset{style=mystyle}
 
@@ -209,10 +235,9 @@ reliable}
 \frametitle{Warewulf description}
 \framesubtitle{database \texttt{/etc/warewulf/nodes.conf}}
 \begin{columns}
-%
 \column{0.5\textwidth}
 \begin{itemize}
-\item plain yaml file
+  \item plain yaml file
   \item easy backup
   \item can be version controlled
   \item external tools support
@@ -286,6 +311,45 @@ n01  NetDevs[default].Hwaddr  --         52:54:00:4e:cb:1d
 n01  NetDevs[default].Ipaddr  --         172.16.130.101
 n01  NetDevs[default].Netmask --         (255.255.255.0)
 n01  NetDevs[default].Primary --         (true)
+\end{lstlisting}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf description}
+\framesubtitle{node configuration}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{Configuration templates}
+  \begin{itemize}
+    \item based on go templates
+    \item $\{\{ .foo \}\}$ replaced \\
+    with variable \texttt{foo}
+    \item exported go function \\
+    can be called
+  \end{itemize}
+\end{block}
+\begin{block}{Configurationi overlays}
+\begin{itemize}
+  \item rendered templates packed\\
+  into overlay
+  \item overlay put ontop \\
+  of node image
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\begin{lstlisting}[style=ww,caption=issue.ww]
+Warewulf Node:      {{.Id}}
+Container:          {{.Container}}
+{{ if .Kernel.Version }}Kernel:             {{.Kernel.Version}} {{ end -}}
+Kernelargs:         {{.Kernel.Args}}
+
+Network:
+{{- range $devname, $netdev := .NetDevs}}
+    {{$devname}}: {{$netdev.Device}}
+    {{$devname}}: {{$netdev.IpCIDR}}
+{{if $netdev.Ipaddr6 }}    {{$devname}}: {{$netdev.Ipaddr6}}{{ end -}}
+{{if $netdev.Hwaddr }}    {{$devname}}: {{$netdev.Hwaddr}}{{ end -}}
+{{end}}
 \end{lstlisting}
 \end{columns}
 \end{frame}
