@@ -28,7 +28,6 @@
     tabsize=2
 }
 
-
 \lstdefinestyle{yaml}{
     basicstyle=\color{blue}\footnotesize,
     string=[s]{'}{'},
@@ -51,6 +50,7 @@
     showtabs=false,
     tabsize=2
  }
+
 \lstdefinestyle{ww}{
     basicstyle=\color{blue}\footnotesize,
     morestring=[b]{"},
@@ -76,6 +76,30 @@
     tabsize=2,
     keywords={if,range,end},
  }
+
+\lstdefinestyle{wwctl}{
+    language=bash,
+    basicstyle=\color{blue}\footnotesize,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=t,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    morestring=[s]{\ W}{=},
+    keywords={wwctl,container,import,shell,export,node,add,set,list},
+ }
+
 
 
 \lstset{style=mystyle}
@@ -280,13 +304,19 @@ nodes:
 \begin{columns}
 \column{0.25\textwidth}
 \begin{block}{add node}
-\texttt{wwctl node add n01 -I 10.10.10.1}
+\begin{lstlisting}[style=wwctl]
+wwctl node add n01 -I 10.10.10.1
+\end{lstlisting}
 \end{block}
 \begin{block}{modify node}
-\texttt{wwctl node set n01 --comment "Have fun"}
+\begin{lstlisting}[style=wwctl]
+wwctl node set n01 --comment "Have fun"
+\end{lstlisting}
 \end{block}
 \begin{block}{list node}
-\texttt{wwctl node list n01 -a"}
+\begin{lstlisting}[style=wwctl]
+wwctl node list n01 -a
+\end{lstlisting}
 \end{block}
 \vspace*{3cm}
 \column{0.75\textwidth}
@@ -450,6 +480,88 @@ warewulf defines two types of overlays
     \item Debian Bockworm
   \end{itemize}
 \end{block}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf configuration}
+\framesubtitle{node image examples}
+\begin{block}{Import the SLE image}
+\begin{lstlisting}[style=wwctl]
+ww4-host:~> export WAREWULF_OCI_USERNAME=cgoll@suse.com
+ww4-host:~> export WAREWULF_OCI_PASSWORD=INTERNAL-USE-ONLY-xxxxxx
+ww4-host:~> wwctl container import docker://registry.suse.com/suse/hpc/warewulf4-x86_64/sle-hpc-node:latest sle-hpc
+\end{lstlisting}
+\end{block}
+\begin{block}{Import the Leap image}
+\begin{lstlisting}[style=wwctl]
+ww4-host:~> wwctl container import container import docker://registry.opensuse.org/science/warewulf/leap-15.5/containers/kernel:latest leap
+\end{lstlisting}
+\end{block}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf configuration}
+\framesubtitle{node image examples}
+\begin{block}{Execute shell in images}
+\begin{lstlisting}[style=wwctl]
+wwctl container shell sle-hpc
+WARN   : Couldn`t mount /etc/SUSEConnect to /etc/SUSEConnect: no such file or directory
+WARN   : Couldn`t mount /etc/zypp/credentials.d/SCCcredentials to /etc/zypp/credentials.d/SCCcredentials: no such file or directory
+[sle-hpc] Warewulf>
+\end{lstlisting}
+\begin{itemize}
+  \item SLE registration from outer node is mounted into image
+\end{itemize}
+\end{block}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf configuration}
+\framesubtitle{disk management}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{Needs following elements:}
+\begin{itemize}
+  \item disks
+  \item partitions needs parent disk
+  \item filesystem needs partent partition
+\end{itemize}
+\end{block}
+\begin{block}{implementation}
+  \begin{itemize}
+    \item call \texttt{ignition} with {ignition-ww4-disk.service} \\
+    \item \textbf{not} in dracut 
+    \item \textbf{before} \texttt{sysroot.mount}
+  \end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\begin{block}{single parition}
+\begin{lstlisting}[style=wwctl]
+wwctl node set n01 --diskname /dev/vda --diskwipe --partname scratch --partcreate --fsname scratch --fsformat btrfs --fspath /scratch --fswipe
+\end{lstlisting}
+\end{block}
+\begin{block}{add swap}
+\begin{lstlisting}[style=wwctl]
+wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnumber 1 --fsname swap --fsformat swap --fspath swap
+\end{lstlisting}
+\end{block}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf boot}
+\framesubtitle{boot process}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{boot with iPXE}
+\begin{itemize}
+  \item distribution iPXE binaries are used
+  \item \texttt{tftp} transfers are small
+  \item \texttt{kernel} is extracted from container on the fly
+  \item root fs is the container image\\
+  configuration overlay added on top
+  \item \textbf{no} secure boot
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\includegraphics[width=.9\linewidth]{ipxe_boot}
 \end{columns}
 \end{frame}
 %
