@@ -104,7 +104,7 @@
 
 \lstset{style=mystyle}
 
-\title{Warewulf\\
+\title{warewulf\\
 making cluster\\
 installations fast and \\
 reliable}
@@ -119,7 +119,7 @@ reliable}
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Introduction}
-\framesubtitle{Warewulf is tool for managing beowulf clusters}
+\framesubtitle{warewulf is tool for managing beowulf clusters}
 \begin{columns}
 \column{0.5\textwidth}
 \begin{block}{Beowulf}
@@ -240,7 +240,7 @@ reliable}
     \end{block}
     \begin{block}{tftp}
       \begin{itemize}
-      \item kernel tftp
+      \item tftp from \texttt{kernel.org}
       \item dnsmasq
     \end{itemize}
     \end{block}
@@ -272,7 +272,7 @@ reliable}
 \begin{block}{profiles}
 \begin{itemize}
   \item stores identical values for collection of nodes
-  \item values can be overiden on node basis
+  \item values can be overridden on node basis
 \end{itemize}
 \end{block}
 \column{0.5\textwidth}
@@ -367,7 +367,46 @@ n01  NetDevs[default].Primary --         (true)
 \end{itemize}
 \end{block}
 \column{0.5\textwidth}
-\begin{lstlisting}[style=ww,caption=issue.ww]
+\begin{lstlisting}[style=ww,caption=/etc/issue.ww]
+Warewulf Node:      {{.Id}}
+Container:          {{.Container}}
+{{ if .Kernel.Version }}Kernel:             {{.Kernel.Version}} {{ end -}}
+Kernelargs:         {{.Kernel.Args}}
+
+Network:
+{{- range $devname, $netdev := .NetDevs}}
+    {{$devname}}: {{$netdev.Device}}
+    {{$devname}}: {{$netdev.IpCIDR}}
+{{if $netdev.Ipaddr6 }}    {{$devname}}: {{$netdev.Ipaddr6}}{{ end -}}
+{{if $netdev.Hwaddr }}    {{$devname}}: {{$netdev.Hwaddr}}{{ end -}}
+{{end}}
+\end{lstlisting}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf configuration}
+\framesubtitle{rendered templates}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{Configuration templates}
+  \begin{itemize}
+    \item based on go templates
+    \item $\{\{ .foo \}\}$ replaced \\
+    with variable \texttt{foo}
+    \item exported go function \\
+    can be called
+  \end{itemize}
+\end{block}
+\begin{block}{Configuration overlays}
+\begin{itemize}
+  \item rendered templates packed\\
+  into overlay
+  \item overlay put ontop \\
+  of node image
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\begin{lstlisting}[style=ww,caption=/etc/issue.ww]
 Warewulf Node:      {{.Id}}
 Container:          {{.Container}}
 {{ if .Kernel.Version }}Kernel:             {{.Kernel.Version}} {{ end -}}
@@ -397,7 +436,7 @@ warewulf defines two types of overlays
   \begin{itemize}
     \item wicked
     \item NetworkManager
-    \item EL scripts
+    \item other legacy scripts
   \end{itemize}
   \item nfs mounts
   \item file system mounts
@@ -494,7 +533,7 @@ ww4-host:~> wwctl container import docker://registry.suse.com/suse/hpc/warewulf4
 \end{block}
 \begin{block}{Import the Leap image}
 \begin{lstlisting}[style=wwctl]
-ww4-host:~> wwctl container import container import docker://registry.opensuse.org/science/warewulf/leap-15.5/containers/kernel:latest leap
+ww4-host:~> wwctl container import docker://registry.opensuse.org/science/warewulf/leap-15.5/containers/kernel:latest leap
 \end{lstlisting}
 \end{block}
 \end{frame}
@@ -554,8 +593,8 @@ wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnum
 \begin{itemize}
   \item distribution iPXE binaries are used
   \item \texttt{tftp} transfers are small
-  \item \texttt{kernel} is extracted from container on the fly
-  \item root fs is the container image\\
+  \item \texttt{kernel} is extracted from container/node image on the fly
+  \item root fs is the container/node image\\
   configuration overlay added on top
   \item \textbf{no} secure boot
 \end{itemize}
@@ -564,58 +603,65 @@ wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnum
 \includegraphics[width=.9\linewidth]{ipxe_boot}
 \end{columns}
 \end{frame}
-%
-%
-%\frametitle{Presentation Title}
-%\framesubtitle{This is \textit{a subtitle}.}
-%
-%\begin{columns}
-%
-%\column{0.5\textwidth}
-%This is a text in first column.
-%\begin{itemize}
-%  \item First item
-%  \item Second item
-%  \item \texttt{mono spaced font example}
-%  \begin{itemize}
-%    \item First item
-%    \item Second item
-%  \end{itemize}
-%\end{itemize}
-%
-%\column{0.5\textwidth}
-%This text will be in the second column
-%and on a second thought this is a nice looking
-%layout in some cases.
-%
-%\begin{lstlisting}[language=C, caption=C example]
-%#include <stdio.h>
-%
-%/* some comment */
-%int main() {
-%  printf("Hello World");
-%}
-%\end{lstlisting}
-%
-%\end{columns}
-%
-%\end{frame}
-%
-%\begin{frame}
-%\frametitle{Another slide}
-%\framesubtitle{This is \textit{a subtitle}.}
-%
-%\begin{table}
-%  \begin{tabular}{c|c}
-%    table1 & trial \\
-%    \hline
-%    \hline
-%    1 & 2 \\
-%    3 & 4
-%  \end{tabular}
-%  \caption*{My table}
-%\end{table}
-%\end{frame}
-%
+\begin{frame}[fragile]
+\frametitle{Warewulf boot}
+\framesubtitle{boot process}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{boot with grub tftp}
+\begin{itemize}
+  \item grub \& shim extracted from host
+  \item secure boot only possible if host shim \& grub can boot node kernel
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\includegraphics[width=.7\linewidth]{grub_ipxe}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf boot}
+\framesubtitle{boot process}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{boot with grub http}
+\begin{itemize}
+  \item grub \& shim xtracted from node/container image
+  \item secure boot with various distributions
+  \item must be configured in BIOS
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\includegraphics[width=.8\linewidth]{grub_http}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf}
+\framesubtitle{development}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{block}{availiability}
+  \begin{itemize}
+    \item part of SLE since 15SP5
+    \item SLE node/container avaible
+  \end{itemize}
+\end{block}
+\begin{block}{upstream}
+\texttt{github.com/warewulf/warewulf} \\
+Rocky Linux Foundation project\\
+Stakeholders:
+\begin{itemize}
+  \item SUSE
+  \item CIQ
+  \item Intel/openHPC
+\end{itemize}
+\end{block}
+\column{0.5\textwidth}
+\includegraphics[width=.8\linewidth]{warewulf-logo}
+\end{columns}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Warewulf}
+Thank your, for you attention!
+\end{frame}
 \end{document}
 
