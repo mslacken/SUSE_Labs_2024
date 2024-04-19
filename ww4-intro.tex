@@ -104,7 +104,7 @@
 
 \lstset{style=mystyle}
 
-\title{warewulf\\
+\title{Warewulf\\
 making cluster\\
 installations fast and \\
 reliable}
@@ -119,9 +119,9 @@ reliable}
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Introduction}
-\framesubtitle{warewulf is tool for managing beowulf clusters}
+\framesubtitle{Warewulf is tool for managing Beowulf clusters}
 \begin{columns}
-\column{0.5\textwidth}
+\column{0.7\textwidth}
 \begin{block}{Beowulf}
   \begin{itemize}
     \item old british poem
@@ -132,14 +132,18 @@ reliable}
     \item became popular in the 90.
     \item use of the shelf hardware
     \begin{itemize}
-      \item 486 \& linux
-      \item \textbf{not} Cray \& unix
+      \item 486 \& Linux \textbf{not} Cray \& Unix
     \end{itemize}
-    \item warewulf is a typo of werewolf
+    \item Warewulf is a typo of werewolf
+    \item Caos Linux \& Warewulf were designed for Beowulf clusters
+    \item Caos Linux evolved into CentOS
+    \begin{itemize}
+      \item Gregory Kurtzner started developement of Warewulf v4
+    \end{itemize}
   \end{itemize}
 \end{block}
-\column{0.5\textwidth}
-  \includegraphics[width=.6\linewidth]{Beowulf}
+\column{0.3\textwidth}
+  \includegraphics[width=\linewidth]{Beowulf}
 \end{columns}
 \end{frame}
 
@@ -159,7 +163,7 @@ reliable}
 \end{table}
 \begin{itemize}
   \item only Fugaku uses non standard CPU
-  \item others are beowulf clusters with GPUs attached
+  \item others are Beowulf clusters with GPUs attached
 \end{itemize}
 \end{block}
 \end{frame}
@@ -168,14 +172,15 @@ reliable}
 \framesubtitle{Beowulf cluster}
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{base components}
+\begin{block}{Base components}
 \begin{itemize}
   \item management node
   \item compute nodes
   \item management network
+  \item network boot (PXE)
 \end{itemize}
 \end{block}
-\begin{block}{optional components}
+\begin{block}{Optional components}
 \begin{itemize}
   \item more compute nodes
   \item fast network interconnects 
@@ -192,14 +197,16 @@ reliable}
 \framesubtitle{Beowulf Cluster}
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{differences to data centers}
+\begin{block}{Differences to data centers}
   \begin{itemize}
     \item compute nodes are cattle
+    \begin{itemize}
+      \item parallel/MPI require identical nodes
+    \end{itemize}
     \item hierarchical organization
     \item compute are not updated after boot process
-    \item application come from central storage
-    \item applications are self compiled
-    \item one application can run over several nodes
+    \item applications come from central storage
+    \item applications are self compiled with tools like \texttt{spack} \& \texttt{EasyBuild}
   \end{itemize}
 \end{block}
 \column{0.5\textwidth}
@@ -208,12 +215,15 @@ reliable}
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf description}
-\framesubtitle{software stack}
+\framesubtitle{Software stack}
 \begin{columns}
-\column{0.5\textwidth}
-  \begin{block}{warewulf components}
+\column{0.6\textwidth}
+  \begin{block}{Warewulf components}
   \hspace*{.1\linewidth}\begin{minipage}{.8\linewidth}
-  \begin{block}{warewulfd delivers}
+  \begin{block}{Compute nodes}
+    \textbf{boot from network into tmpfs}
+  \end{block}
+  \begin{block}{Warewulfd delivers}
     \begin{itemize}
       \item kernel \& modules
       \item node image
@@ -226,16 +236,15 @@ reliable}
       \item manages node image
     \end{itemize}
   \end{block}
-  \vspace*{1cm}
   \end{minipage}
   \end{block}
-\column{0.5\textwidth}
+\column{0.4\textwidth}
   \begin{block}{external components}
   \hspace*{.1\linewidth}\begin{minipage}{.8\linewidth}
-    \begin{block}{dhcp server}
+    \begin{block}{Dhcp server}
       \begin{itemize}
-      \item ISC dhcpd server
-      \item dnsmasq
+      \item ISC \texttt{dhcpd} server
+      \item \texttt{dnsmasq}
     \end{itemize}
     \end{block}
     \begin{block}{tftp}
@@ -246,7 +255,7 @@ reliable}
     \end{block}
   \end{minipage} 
   \end{block}
-  \begin{block}{optional}
+  \begin{block}{Optional}
     \begin{itemize}
       \item nfs
       \item manage \texttt{/etc/hosts}
@@ -269,7 +278,7 @@ reliable}
     \item vim, ansible
   \end{itemize}
 \end{itemize}
-\begin{block}{profiles}
+\begin{block}{Profiles}
 \begin{itemize}
   \item stores identical values for collection of nodes
   \item values can be overridden on node basis
@@ -346,7 +355,7 @@ n01  NetDevs[default].Primary --         (true)
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf configuration}
-\framesubtitle{templates\& overlays}
+\framesubtitle{Templates\& Overlays}
 \begin{columns}
 \column{0.5\textwidth}
 \begin{block}{Configuration templates}
@@ -362,12 +371,12 @@ n01  NetDevs[default].Primary --         (true)
 \begin{itemize}
   \item rendered templates packed\\
   into overlay
-  \item overlay put ontop \\
+  \item overlay put on top\\
   of node image
 \end{itemize}
 \end{block}
 \column{0.5\textwidth}
-\begin{lstlisting}[style=ww,caption=/etc/issue.ww]
+\begin{lstlisting}[style=ww,caption=/etc/issue.ww $\rightarrow$ /etc/issue]
 Warewulf Node:      {{.Id}}
 Container:          {{.Container}}
 {{ if .Kernel.Version }}Kernel:             {{.Kernel.Version}} {{ end -}}
@@ -380,55 +389,57 @@ Network:
 {{if $netdev.Ipaddr6 }}    {{$devname}}: {{$netdev.Ipaddr6}}{{ end -}}
 {{if $netdev.Hwaddr }}    {{$devname}}: {{$netdev.Hwaddr}}{{ end -}}
 {{end}}
+
+Greetings from {{ .Tags.Location }}
 \end{lstlisting}
 \end{columns}
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf configuration}
-\framesubtitle{rendered templates}
+\framesubtitle{Rendered template}
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{Configuration templates}
+\begin{block}{User defined variables}
   \begin{itemize}
-    \item based on go templates
-    \item $\{\{ .foo \}\}$ replaced \\
-    with variable \texttt{foo}
-    \item exported go function \\
-    can be called
+    \item every profile/node can have user defined variables\\
+    \item extra namespace for networks
   \end{itemize}
 \end{block}
-\begin{block}{Configuration overlays}
-\begin{itemize}
-  \item rendered templates packed\\
-  into overlay
-  \item overlay put ontop \\
-  of node image
-\end{itemize}
+\begin{block}{Add location tag}
+\begin{lstlisting}[style=wwctl]
+wwctl node set n01 --tagadd="Location=Ostrava"
+\end{lstlisting}
+\end{block}
+\begin{block}{Render template}
+\begin{lstlisting}[style=wwctl]
+wwctl overlay show --render n01 wwinit /etc/issue.ww
+\end{lstlisting}
 \end{block}
 \column{0.5\textwidth}
-\begin{lstlisting}[style=ww,caption=/etc/issue.ww]
-Warewulf Node:      {{.Id}}
-Container:          {{.Container}}
-{{ if .Kernel.Version }}Kernel:             {{.Kernel.Version}} {{ end -}}
-Kernelargs:         {{.Kernel.Args}}
+\begin{lstlisting}[language=xml,style=ww,caption=renderd /etc/issue]
+backupFile: true
+writeFile: true
+Filename: /etc/issue
+Warewulf Node:      n01
+Container:          leap
+Kernelargs:         quiet crashkernel=no vga=791 net.naming-scheme=v238
 
 Network:
-{{- range $devname, $netdev := .NetDevs}}
-    {{$devname}}: {{$netdev.Device}}
-    {{$devname}}: {{$netdev.IpCIDR}}
-{{if $netdev.Ipaddr6 }}    {{$devname}}: {{$netdev.Ipaddr6}}{{ end -}}
-{{if $netdev.Hwaddr }}    {{$devname}}: {{$netdev.Hwaddr}}{{ end -}}
-{{end}}
+    default: eth0
+    default: 172.16.130.101/24
+    default: 52:54:00:4e:cb:1d
+
+Greetings from Ostrava
 \end{lstlisting}
 \end{columns}
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf configuration}
-\framesubtitle{overlays}
+\framesubtitle{Overlays}
 warewulf defines two types of overlays
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{system overlay}
+\begin{block}{System overlay}
 \begin{itemize}
   \item available on boot
   \item warewulf boot strap files
@@ -443,13 +454,13 @@ warewulf defines two types of overlays
 \end{itemize}
 \end{block}
 \column{0.5\textwidth}
-\begin{block}{runtime overlay}
+\begin{block}{Runtime overlay}
 \begin{itemize}
-  \item updated on regular base
+  \item updated regulary 
   \item can be secured
 \end{itemize}
 \end{block}
-\begin{block}{user defined overlays}
+\begin{block}{User defined overlays}
 \begin{itemize}
   \item users are encouraged to create own configuration templates
   \item can reside in system \& runtime overlays
@@ -459,45 +470,43 @@ warewulf defines two types of overlays
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf configuration}
-\framesubtitle{security}
+\framesubtitle{Security}
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{assumptions}
+\begin{block}{Assumptions}
   \begin{itemize}
     \item private/cluster network is secure
-    \item lateral movement isnt't accounted
-    \begin{itemize}
-      \item NFS mounts are common, when not \textbf{mandatory}
-    \end{itemize}
+    \item parallel filesystems \& NFS \\
+    $\rightarrow$ root on node means root everywhere
   \end{itemize}
+  \includegraphics[width=\linewidth]{beowulf_architecture}
 \end{block}
 \column{0.5\textwidth}
 \begin{block}{measurements}
   \begin{itemize}
-    \item node image \& system overlay protected with BIOS UUID
+    \item node image \& system overlay protected with Asset Tag 
     \item system overlays \textbf{must} be downloaded from privileged port
+    \item persistant malware installation is impossible as node images are ephermal
   \end{itemize}
 \end{block}
 \end{columns}
-\includegraphics[height=3.5cm]{beowulf_architecture}
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf configuration}
-\framesubtitle{node images}
+\framesubtitle{Node images}
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{definition}
+\begin{block}{ELements}
 \begin{itemize}
   \item complete OS images
   \item called containers in warewulf
   \item must be imported from:
   \begin{itemize}
     \item chroot directory
-    \item docker registry
-    \item local \texttt{dockerd}
+    \item OCI registry
   \end{itemize}
-  \item several different node images can be imported
-  \item node images are vendor independent
+  \item multiple different node images can be imported
+  \item node images independent from host OS
 \end{itemize}
 \end{block}
 \column{0.5\textwidth}
@@ -523,28 +532,22 @@ warewulf defines two types of overlays
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf configuration}
-\framesubtitle{node image examples}
-\begin{block}{Import the SLE image}
+\framesubtitle{Node image examples}
+\begin{block}{Import SLE image from SUSE registry}
 \begin{lstlisting}[style=wwctl]
-ww4-host:~> export WAREWULF_OCI_USERNAME=cgoll@suse.com
-ww4-host:~> export WAREWULF_OCI_PASSWORD=INTERNAL-USE-ONLY-xxxxxx
-ww4-host:~> wwctl container import docker://registry.suse.com/suse/hpc/warewulf4-x86_64/sle-hpc-node:latest sle-hpc
+ww4-host:# export WAREWULF_OCI_USERNAME=cgoll@suse.com
+ww4-host:# export WAREWULF_OCI_PASSWORD=INTERNAL-USE-ONLY-xxxxxx
+ww4-host:# wwctl container import docker://registry.suse.com/suse/hpc/warewulf4-x86_64/sle-hpc-node:latest sle-hpc
 \end{lstlisting}
 \end{block}
-\begin{block}{Import the Leap image}
+\begin{block}{Import Leap image openSUSE registry}
 \begin{lstlisting}[style=wwctl]
-ww4-host:~> wwctl container import docker://registry.opensuse.org/science/warewulf/leap-15.5/containers/kernel:latest leap
+ww4-host:# wwctl container import docker://registry.opensuse.org/science/warewulf/leap-15.5/containers/kernel:latest leap
 \end{lstlisting}
 \end{block}
-\end{frame}
-\begin{frame}[fragile]
-\frametitle{Warewulf configuration}
-\framesubtitle{node image examples}
 \begin{block}{Execute shell in images}
 \begin{lstlisting}[style=wwctl]
 wwctl container shell sle-hpc
-WARN   : Couldn`t mount /etc/SUSEConnect to /etc/SUSEConnect: no such file or directory
-WARN   : Couldn`t mount /etc/zypp/credentials.d/SCCcredentials to /etc/zypp/credentials.d/SCCcredentials: no such file or directory
 [sle-hpc] Warewulf>
 \end{lstlisting}
 \begin{itemize}
@@ -560,24 +563,24 @@ WARN   : Couldn`t mount /etc/zypp/credentials.d/SCCcredentials to /etc/zypp/cred
 \begin{block}{Needs following elements:}
 \begin{itemize}
   \item disks
-  \item partitions needs parent disk
-  \item filesystem needs partent partition
+  \item partitions (on disk)
+  \item filesystem (on partition)
 \end{itemize}
 \end{block}
-\begin{block}{implementation}
+\begin{block}{Implementation}
   \begin{itemize}
-    \item call \texttt{ignition} with {ignition-ww4-disk.service} \\
-    \item \textbf{not} in dracut 
+    \item use \texttt{ignition} \\ warewulf has its own service: {ignition-ww4-disk.service}
+    \item \textbf{not}  called in \texttt{initrd}
     \item \textbf{before} \texttt{sysroot.mount}
   \end{itemize}
 \end{block}
 \column{0.5\textwidth}
-\begin{block}{single parition}
+\begin{block}{Single parition}
 \begin{lstlisting}[style=wwctl]
 wwctl node set n01 --diskname /dev/vda --diskwipe --partname scratch --partcreate --fsname scratch --fsformat btrfs --fspath /scratch --fswipe
 \end{lstlisting}
 \end{block}
-\begin{block}{add swap}
+\begin{block}{Add swap}
 \begin{lstlisting}[style=wwctl]
 wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnumber 1 --fsname swap --fsformat swap --fspath swap
 \end{lstlisting}
@@ -586,7 +589,7 @@ wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnum
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf boot}
-\framesubtitle{boot process}
+\framesubtitle{Boot process}
 \begin{columns}
 \column{0.5\textwidth}
 \begin{block}{boot with iPXE}
@@ -605,10 +608,10 @@ wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnum
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf boot}
-\framesubtitle{boot process}
+\framesubtitle{Secure boot }
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{boot with grub tftp}
+\begin{block}{Boot with grub tftp}
 \begin{itemize}
   \item grub \& shim extracted from host
   \item secure boot only possible if host shim \& grub can boot node kernel
@@ -619,13 +622,13 @@ wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnum
 \end{columns}
 \end{frame}
 \begin{frame}[fragile]
-\frametitle{Warewulf boot}
-\framesubtitle{boot process}
+\frametitle{Warewulf secure boot}
+\framesubtitle{Cross product secure boot }
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{boot with grub http}
+\begin{block}{Boot with grub http}
 \begin{itemize}
-  \item grub \& shim xtracted from node/container image
+  \item grub \& shim extracted from node/container image
   \item secure boot with various distributions
   \item must be configured in BIOS
 \end{itemize}
@@ -636,13 +639,13 @@ wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnum
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf}
-\framesubtitle{development}
+\framesubtitle{Development}
 \begin{columns}
 \column{0.5\textwidth}
-\begin{block}{availiability}
+\begin{block}{Availiability}
   \begin{itemize}
     \item part of SLE since 15SP5
-    \item SLE node/container avaible
+    \item SLE node/container available
   \end{itemize}
 \end{block}
 \begin{block}{upstream}
