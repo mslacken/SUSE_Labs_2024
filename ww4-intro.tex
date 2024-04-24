@@ -108,7 +108,7 @@
 making cluster\\
 installations fast and \\
 reliable}
-\date{April 25, Ostrava}
+\date{April 24, Ostrava}
 \author{Christian Goll <\texttt{cgoll@suse.com}>}
 \usetheme{suse}
 
@@ -130,7 +130,7 @@ reliable}
 \begin{block}{Beowulf cluster}
   \begin{itemize}
     \item became popular in the 90.
-    \item use of the shelf hardware
+    \item use off the shelf hardware
     \begin{itemize}
       \item 486 \& Linux \textbf{not} Cray \& Unix
     \end{itemize}
@@ -486,7 +486,7 @@ warewulf defines two types of overlays
   \begin{itemize}
     \item node image \& system overlay protected with Asset Tag 
     \item system overlays \textbf{must} be downloaded from privileged port
-    \item persistant malware installation is impossible as node images are ephermal
+    \item persistent malware installation is impossible as node images are ephermal
   \end{itemize}
 \end{block}
 \end{columns}
@@ -614,7 +614,8 @@ wwctl node set n01 --diskname /dev/vda --partname swap --partsize=1024 --partnum
 \begin{block}{Boot with grub tftp}
 \begin{itemize}
   \item grub \& shim extracted from host
-  \item secure boot only possible if host shim \& grub can boot node kernel
+  \item secure boot only possible if host shim \& grub can boot \\
+  node kernel
 \end{itemize}
 \end{block}
 \column{0.5\textwidth}
@@ -664,7 +665,12 @@ Stakeholders:
 \end{frame}
 \begin{frame}[fragile]
 \frametitle{Warewulf}
+\begin{columns}
+\column{0.5\textwidth}
 Thank your, for you attention!
+\column{0.5\textwidth}
+\includegraphics[width=.8\linewidth]{vector-chameleon-213x300}
+\end{columns}
 \end{frame}
 \end{document}
 
